@@ -1,11 +1,13 @@
-# starter-express-api
+# onepage-server
 
-This is the simplest possible nodejs api using express that responds to any request with: 
-```
-Yo!
-```
+First project write with Javascript, HTML, CSS, Nodejs.
 
-### Deploy it in 7 seconds: 
+Backend server for tailor web html.
 
-[![Deploy to Cyclic](https://deploy.cyclic.app/button.svg)](https://deploy.cyclic.app/)
+**Main feature:**
+
+* Client send post request with token to update link to active updater.
+* Auto get html source web from many site at same time.
+* Auto stack all html source into one json and send the result to Google Firebase to update database (not waste write counter on server).
+* ...
 
