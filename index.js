@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 8080;
-const domain = 'https://onepage.herokuapp.com';
+const domain = 'https://onepage.cyclic.app';
 
 const admin = require('firebase-admin');
 const serviceAccount = require('./onepage-serviceAccountKey.json');
