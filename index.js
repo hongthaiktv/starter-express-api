@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
                         </head>
                         <body>
                             <h1 style="text-align:center;">Onepage Update Center</h1>
-                            <h3>This Codespaces page only for Administrator. Please contact for further support. Thanks!</h3>
+                            <h3>This page only for Administrator. Please contact for further support. Thanks!</h3>
                             <br>
                             <p>If you seeing this page it mean everything ok.</p>
                         </body>
