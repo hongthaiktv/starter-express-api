@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 8080;
 const domain = 'https://onepage.cyclic.app';
 
 const admin = require('firebase-admin');
-const serviceAccount = require('./onepage-serviceAccountKey.json');
+const serviceAccount = JSON.parse(process.env.serviceAccountKey);
 const jsdom = require('jsdom');
 const { JSDOM } = jsdom;
 const request = require('request');
