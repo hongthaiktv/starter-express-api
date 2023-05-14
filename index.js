@@ -117,7 +117,7 @@ function updateHTML(url, query, order, counter) {
                         request({
                                 url: url,
                                 headers: {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0"},
-                                strictSSL: true
+                                strictSSL: false
                         },
                         function (error, response, body) {
                                 if (error) reject(error);
