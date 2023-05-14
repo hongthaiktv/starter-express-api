@@ -40,15 +40,14 @@ async function s3Put(file, location) {
 	console.log('Upload to AWS S3 Server success.');
 }
 
-s3Put(apiKey, 'API/serviceAccountKey.json');
+//s3Put(apiKey, 'API/serviceAccountKey.json');
 
 async function s3Get(file) {
     let apiKey =  await s3.getObject({
-	ContentType: 'application/json',
         Bucket: "cyclic-desert-sand-barnacle-shoe-ap-northeast-1",
         Key: file
     }).promise();
-    console.log(apiKey);
+    console.log(apiKey.Body.toString());
     return apiKey;
 }
 
