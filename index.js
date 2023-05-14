@@ -21,6 +21,7 @@ async function s3Get(file) {
         Bucket: "cyclic-desert-sand-barnacle-shoe-ap-northeast-1",
         Key: file
     }).promise();
+    apiKey = JSON.parse(apiKey);
     console.log(apiKey);
     return apiKey;
 }
