@@ -17,7 +17,7 @@ const document = new JSDOM().window.document;
 const token = "5161768feb4d724ef66d6f72aca3a3bd0f5f82a935fcc6d23041e4f6f6f7bfc7fa7e2d2839de9aa1b880d58e529fa6d7fc348f5c48fd0f699068323b9078cc8ac4ef5dab4a6a894bc9c58e1b5791602b4aa345d9ca994daa441fe80c419635435538d81fe8f675e2564ffa2483a0ee4f580da319f602bd33dff198991c2c79dc";
 
 async function s3Get(file) {
-    let apiKey =  await s3.putObject({
+    let apiKey =  await s3.getObject({
         Bucket: "cyclic-desert-sand-barnacle-shoe-ap-northeast-1",
         Key: file
     }).promise();
