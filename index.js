@@ -3,48 +3,70 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 8080;
 const domain = 'https://onepage.cyclic.app';
-
 const admin = require('firebase-admin');
 const AWS = require("aws-sdk");
 const s3 = new AWS.S3();
-const serviceAccount = require('./onepage-serviceAccountKey.json');
-//const serviceAccount = JSON.parse(process.env.serviceAccountKey);
 const jsdom = require('jsdom');
 const { JSDOM } = jsdom;
 const request = require('request');
 const document = new JSDOM().window.document;
 
+
 const token = "5161768feb4d724ef66d6f72aca3a3bd0f5f82a935fcc6d23041e4f6f6f7bfc7fa7e2d2839de9aa1b880d58e529fa6d7fc348f5c48fd0f699068323b9078cc8ac4ef5dab4a6a894bc9c58e1b5791602b4aa345d9ca994daa441fe80c419635435538d81fe8f675e2564ffa2483a0ee4f580da319f602bd33dff198991c2c79dc";
 
-async function s3Put(file, location) {
-    await s3.putObject({
+function dateUTC7() {
+    let now = Date.now() + (7 * 60 * 60 * 1000);
+    return new Date(now).toUTCString() + "7";
+}
+console.log(dateUTC7());
+
+const APPSETTING = {};
+var db;
+
+try {
+    APPSETTING.serviceAccount = require('./onepage-serviceAccountKey.json');
+    console.log('Uploading Firebase config to AWS...');
+    s3Put(APPSETTING.serviceAccount, 'API/serviceAccountKey.json').then(result => {
+	serverInit(APPSETTING.serviceAccount);
+    });
+} catch(err) {
+    console.log('Loading Firebase config...');
+    s3Get('API/serviceAccountKey.json').then(result => {
+	serverInit(result);
+    });
+}
+
+async function s3Put(file, path) {
+    let upload = await s3.putObject({
 	ContentType: 'application/json',
 	Body: JSON.stringify(file),
         Bucket: "cyclic-desert-sand-barnacle-shoe-ap-northeast-1",
-        Key: location
+        Key: path
     }).promise();
-	console.log('Upload to AWS S3 Server success.');
+    console.log('Upload to AWS S3 Server success.');
+    return upload;
 }
 
-//s3Put(apiKey, 'API/serviceAccountKey.json');
-
-async function s3Get(file) {
-    let apiKey =  await s3.getObject({
+async function s3Get(path) {
+    let file =  await s3.getObject({
         Bucket: "cyclic-desert-sand-barnacle-shoe-ap-northeast-1",
-        Key: file
+        Key: path
     }).promise();
-    apiKey = JSON.parse(apiKey.Body.toString());
-    console.log(apiKey);
-    return apiKey;
+    file = JSON.parse(file.Body.toString());
+    console.log(`Get file **${path}** success.`);
+    return file;
 }
 
-s3Get('API/serviceAccountKey.json');
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://onepage-1ca8f.firebaseio.com"
-});
-const db = admin.firestore();
+function serverInit(serviceAccount) {
+    admin.initializeApp({
+	credential: admin.credential.cert(serviceAccount),
+	databaseURL: "https://onepage-1ca8f.firebaseio.com"
+    });
+    db = admin.firestore();
+    app.listen(PORT, () => {
+	console.log(`Starting web server as ${domain}:${PORT}`);
+    });
+}
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -86,12 +108,6 @@ app.get('/update', (req, res) => {
         }
 });
       
-app.listen(PORT, () => {
-var dateUTC7 = Date.now() + (7 * 60 * 60 *1000);
-console.log(new Date(dateUTC7).toUTCString() + "7");
-console.log(`Starting server as ${domain}:${PORT}`);
-});
-
 function updateHTML(url, query, order, counter) {
         return new Promise(function(resolve, reject) {
                 if (counter) ++counter.counter;
