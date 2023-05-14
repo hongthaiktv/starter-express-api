@@ -21,10 +21,11 @@ async function s3Get(file) {
         Bucket: "cyclic-desert-sand-barnacle-shoe-ap-northeast-1",
         Key: file
     }).promise();
+    console.log(apiKey);
     return apiKey;
 }
 
-console.log(s3Get('API/serviceAccountKey.json'));
+s3Get('API/serviceAccountKey.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
