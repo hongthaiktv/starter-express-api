@@ -32,6 +32,7 @@ var apiKey =
 
 async function s3Put(file, location) {
     await s3.putObject({
+	ContentType: 'application/json',
 	Body: JSON.stringify(file),
         Bucket: "cyclic-desert-sand-barnacle-shoe-ap-northeast-1",
         Key: location
@@ -43,6 +44,7 @@ s3Put(apiKey, 'API/serviceAccountKey.json');
 
 async function s3Get(file) {
     let apiKey =  await s3.getObject({
+	ContentType: 'application/json',
         Bucket: "cyclic-desert-sand-barnacle-shoe-ap-northeast-1",
         Key: file
     }).promise();
