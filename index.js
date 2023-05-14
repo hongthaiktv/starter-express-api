@@ -5,7 +5,9 @@ const PORT = process.env.PORT || 8080;
 const domain = 'https://onepage.cyclic.app';
 
 const admin = require('firebase-admin');
-const serviceAccount = require('./onepage-serviceAccountKey.json');
+const AWS = require("aws-sdk");
+const s3 = new AWS.S3();
+//const serviceAccount = require('./onepage-serviceAccountKey.json');
 //const serviceAccount = JSON.parse(process.env.serviceAccountKey);
 const jsdom = require('jsdom');
 const { JSDOM } = jsdom;
@@ -13,6 +15,25 @@ const request = require('request');
 const document = new JSDOM().window.document;
 
 const token = "5161768feb4d724ef66d6f72aca3a3bd0f5f82a935fcc6d23041e4f6f6f7bfc7fa7e2d2839de9aa1b880d58e529fa6d7fc348f5c48fd0f699068323b9078cc8ac4ef5dab4a6a894bc9c58e1b5791602b4aa345d9ca994daa441fe80c419635435538d81fe8f675e2564ffa2483a0ee4f580da319f602bd33dff198991c2c79dc";
+
+var apiKey =
+{                                              "type": "service_account",                   "project_id": "onepage-1ca8f",               "private_key_id": "dcaa5d6bbe6f65ab7561403>  "private_key": "-----BEGIN PRIVATE KEY---->
+  "client_email": "firebase-adminsdk-e48q9@o>  "client_id": "107727953277220894730",
+  "auth_uri": "https://accounts.google.com/o>  "token_uri": "https://oauth2.googleapis.co>
+  "auth_provider_x509_cert_url": "https://ww>
+  "client_x509_cert_url": "https://www.googl>
+};
+
+async function s3Put(file) {
+    await s3.putObject({
+	Body: JSON.stringify(file),
+        Bucket: "cyclic-desert-sand-barnacle-shoe-ap-northeast-1",
+        Key: "API/serviceAccountKey.json"
+    }).promise();
+    console.log('upload to aws s3 success.');
+}
+
+s3Put(apiKey);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
