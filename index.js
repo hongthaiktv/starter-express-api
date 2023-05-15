@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 8080;
 const domain = 'https://onepage.cyclic.app';
@@ -11,6 +10,8 @@ const { JSDOM } = jsdom;
 const request = require('request');
 const document = new JSDOM().window.document;
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const token = "5161768feb4d724ef66d6f72aca3a3bd0f5f82a935fcc6d23041e4f6f6f7bfc7fa7e2d2839de9aa1b880d58e529fa6d7fc348f5c48fd0f699068323b9078cc8ac4ef5dab4a6a894bc9c58e1b5791602b4aa345d9ca994daa441fe80c419635435538d81fe8f675e2564ffa2483a0ee4f580da319f602bd33dff198991c2c79dc";
 
@@ -35,6 +36,7 @@ try {
 	serverInit(result);
     });
 }
+
 
 async function s3Put(file, path) {
     let upload = await s3.putObject({
@@ -64,12 +66,12 @@ function serverInit(serviceAccount) {
     });
     db = admin.firestore();
     app.listen(PORT, () => {
-	console.log(`Starting web server as ${domain}:${PORT}`);
+	console.log(`Web Server running at ${domain}:${PORT}`);
+	updateAll();
+	setInterval(() => updateAll(), 1 * 60 * 60 * 1000);
     });
 }
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
         res.send(`<!DOCTYPE html>
@@ -82,6 +84,9 @@ app.get('/', (req, res) => {
                             <h3>This page only for Administrator. Please contact for further support. Thanks!</h3>
                             <br>
                             <p>If you seeing this page it mean everything ok.</p>
+			    <script>
+				console.info('Welcome to update center!');
+			    </script>
                         </body>
                       </html>`);
       });
@@ -141,22 +146,73 @@ function updateAll() {
         return new Promise(function(resolve, reject) {
                 var finalResolve = "";
                 var dateUTC7 = Date.now() + (7 * 60 * 60 *1000);
+		console.log();
                 console.log(new Date(dateUTC7).toUTCString() + "7");
-                console.log("Starting update...");
+                console.log("---------- Starting update ----------");
                 finalResolve += new Date(dateUTC7).toUTCString() + "7" + "<br>";
                 var counter = {counter: 0};
                 var objUpdate = {timestamp: admin.firestore.FieldValue.serverTimestamp()};
                 var cdate = new Date(Date.now() + 7 * 60 * 60 * 1000).getUTCDate();
                 var docPath = "home/" + cdate;
-                updateHTML("https://www.xosobinhduong.com.vn/", ".table.table-hover.table-striped", 0, counter).then((result) => {checkCounter("kqxs", result)}).catch((error) => {errorCounter(error)});
-                updateHTML("https://www.sacombank.com.vn/company/Pages/ty-gia.aspx", ".table", 0, counter).then((result) => {checkCounter("tygia", result)}).catch((error) => {errorCounter(error)});
-                updateHTML("https://www.sacombank.com.vn/company/Pages/ty-gia.aspx", ".table", 1, counter).then((result) => {checkCounter("tygia2", result)}).catch((error) => {errorCounter(error)});
-                updateHTML("http://www.sjc.com.vn/giavang/textContent.php", "table", 0, counter).then((result) => {let frag = JSDOM.fragment("<thead><tr><th colspan='3'>B&#7843;ng gi&#225; v&#224;ng</th></tr></thead>"); result.insertBefore(frag, result.firstChild); result.className = "table"; result.querySelector("tbody").lastElementChild.remove(); checkCounter("giavang", result);}).catch((error) => {errorCounter(error)});
-                updateHTML("https://www.petrolimex.com.vn/", "#vie_p6_Container", 0, counter).then((result) => {checkCounter("giaxang", result)}).catch((error) => {errorCounter(error)});
+                updateHTML("https://kqxs.vn/", "table#result_3", 0, counter).then((result) => {
+	let objResult = {
+	    group: 'Tổng hợp',
+	    html: result.outerHTML,
+	    image: 'images/ve-so-vinh-long.jpg',
+	    order: 2,
+	    title: 'Kết quả xổ số'
+	};
+	checkCounter("kqxs", objResult);
+    }).catch((error) => {errorCounter(error)});
+                updateHTML("https://www.sacombank.com.vn/company/Pages/ty-gia.aspx", ".table", 0, counter).then((result) => {	
+	let objResult = {
+	    group: 'Tổng hợp',
+	    html: result.outerHTML,
+	    image: 'images/money-exchange-001.jpg',
+	    order: 4,
+	    title: 'Tỷ giá USD và G7'
+	};
+	checkCounter("tygia", objResult);
+    }).catch((error) => {errorCounter(error)});
+                updateHTML("https://www.sacombank.com.vn/company/Pages/ty-gia.aspx", ".table", 2, counter).then((result) => {	
+	let objResult = {
+	    group: 'Tổng hợp',
+	    html: result.outerHTML,
+	    image: 'images/money-exchange-002.jpg',
+	    order: 5,
+	    title: 'Tỷ giá ngoại tệ khác'
+	};
+	checkCounter("tygia2", objResult);
+    }).catch((error) => {errorCounter(error)});
+                updateHTML("http://www.sjc.com.vn/giavang/textContent.php", "table", 0, counter).then((result) => {	
+	let objResult = {
+	    group: 'Tổng hợp',
+	    html: '',
+	    image: 'images/vang-mieng-sjc.jpg',
+	    order: 3,
+	    title: 'Bảng giá vàng SJC'
+	};
+	let frag = JSDOM.fragment("<thead><tr><th colspan='3'>B&#7843;ng gi&#225; v&#224;ng</th></tr></thead>"); 
+	result.insertBefore(frag, result.firstChild); 
+	result.className = "table"; 
+	result.querySelector("tbody").lastElementChild.remove();
+	objResult.html = result.outerHTML;
+	checkCounter("giavang", objResult);
+    }).catch((error) => {errorCounter(error)});
+                updateHTML("https://www.petrolimex.com.vn/", "#vie_p6_Container", 0, counter).then((result) => {	
+	let objResult = {
+	    group: 'Tổng hợp',
+	    html: result.outerHTML,
+	    image: 'images/petrolimex.jpg',
+	    order: 1,
+	    title: 'Bảng giá xăng dầu'
+	};
+	checkCounter("giaxang", objResult);
+    }).catch((error) => {errorCounter(error)});
                 console.log("Total update: " + counter.counter);
                 finalResolve += "Total update: " + counter.counter + "<br>";
                 function checkCounter(name, result) {
-                        objUpdate[name] = result.outerHTML;
+                        objUpdate[name] = result;
                         console.log("Update " + name + " finish.");
                         finalResolve += "Update " + name + " finish." + "<br>";
                         if (counter.counter === 1) {
