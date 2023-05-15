@@ -5,8 +5,7 @@ const domain = 'https://onepage.cyclic.app';
 const admin = require('firebase-admin');
 const AWS = require("aws-sdk");
 const s3 = new AWS.S3();
-const jsdom = require('jsdom');
-const { JSDOM } = jsdom;
+const { JSDOM } = require('jsdom');
 const request = require('request');
 const document = new JSDOM().window.document;
 
@@ -113,7 +112,7 @@ app.get('/update', (req, res) => {
         }
 });
       
-function updateHTML(url, query, order, counter) {
+function updateHTML(url, query, counter) {
         return new Promise(function(resolve, reject) {
                 if (counter) ++counter.counter;
                 var retry = 0;
@@ -129,7 +128,7 @@ function updateHTML(url, query, order, counter) {
                                 else if (response.statusCode === 200) {
                                         let dom = new JSDOM(body);
                                         let doc = dom.window.document;
-                                        let resultHTML = doc.querySelectorAll(query)[order];
+                                        let resultHTML = doc.querySelectorAll(query);
                                         if (resultHTML !== undefined) resolve(resultHTML);
                                         else reject("Not found query HTML: " + url);
                                 } else {
@@ -154,37 +153,38 @@ function updateAll() {
                 var objUpdate = {timestamp: admin.firestore.FieldValue.serverTimestamp()};
                 var cdate = new Date(Date.now() + 7 * 60 * 60 * 1000).getUTCDate();
                 var docPath = "home/" + cdate;
-                updateHTML("https://kqxs.vn/", "table#result_3", 0, counter).then((result) => {
+                updateHTML("https://kqxs.vn/", "table#result_3", counter).then((result) => {
 	let objResult = {
 	    group: 'Tổng hợp',
-	    html: result.outerHTML,
+	    html: result[0].outerHTML,
 	    image: 'images/ve-so-vinh-long.jpg',
 	    order: 2,
 	    title: 'Kết quả xổ số'
 	};
 	checkCounter("kqxs", objResult);
     }).catch((error) => {errorCounter(error)});
-                updateHTML("https://www.sacombank.com.vn/company/Pages/ty-gia.aspx", ".table", 0, counter).then((result) => {	
+                updateHTML("https://www.sacombank.com.vn/company/Pages/ty-gia.aspx", ".table", counter).then((result) => {	
 	let objResult = {
 	    group: 'Tổng hợp',
-	    html: result.outerHTML,
+	    html: result[0].outerHTML,
 	    image: 'images/money-exchange-001.jpg',
 	    order: 4,
 	    title: 'Tỷ giá USD và G7'
 	};
 	checkCounter("tygia", objResult);
     }).catch((error) => {errorCounter(error)});
-                updateHTML("https://www.sacombank.com.vn/company/Pages/ty-gia.aspx", ".table", 2, counter).then((result) => {	
+                updateHTML("https://www.sacombank.com.vn/company/Pages/ty-gia.aspx", ".table", counter).then((result) => {	
 	let objResult = {
 	    group: 'Tổng hợp',
-	    html: result.outerHTML,
+	    html: result[2].outerHTML,
 	    image: 'images/money-exchange-002.jpg',
 	    order: 5,
 	    title: 'Tỷ giá ngoại tệ khác'
 	};
 	checkCounter("tygia2", objResult);
     }).catch((error) => {errorCounter(error)});
-                updateHTML("http://www.sjc.com.vn/giavang/textContent.php", "table", 0, counter).then((result) => {	
+                updateHTML("http://www.sjc.com.vn/giavang/textContent.php", "table", counter).then((result) => {
+	result = result[0];
 	let objResult = {
 	    group: 'Tổng hợp',
 	    html: '',
@@ -199,15 +199,26 @@ function updateAll() {
 	objResult.html = result.outerHTML;
 	checkCounter("giavang", objResult);
     }).catch((error) => {errorCounter(error)});
-                updateHTML("https://www.petrolimex.com.vn/", "#vie_p6_Container", 0, counter).then((result) => {	
+                updateHTML("https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi.html", "div.post-detail-list.category-thongcao > div", counter).then((result) => {
 	let objResult = {
 	    group: 'Tổng hợp',
-	    html: result.outerHTML,
+	    html: '',
 	    image: 'images/petrolimex.jpg',
 	    order: 1,
 	    title: 'Bảng giá xăng dầu'
 	};
-	checkCounter("giaxang", objResult);
+	for (const [index, ele] of Object.entries(result)) {
+	    let anchor = ele.querySelector('h3 a');
+	    let url = 'https://www.petrolimex.com.vn' + anchor.getAttribute('href');
+	    let urlText = anchor.innerHTML;
+	    if (/điều chỉnh giá xăng dầu/i.test(urlText)) {
+		updateHTML(url, 'div.entry-detail img').then(result => {
+		    objResult.html = result[0].outerHTML;
+		    checkCounter("giaxang", objResult);
+		}).catch(error => errorCounter(error));
+		break;
+	    }
+	}
     }).catch((error) => {errorCounter(error)});
                 console.log("Total update: " + counter.counter);
                 finalResolve += "Total update: " + counter.counter + "<br>";
@@ -217,12 +228,12 @@ function updateAll() {
                         finalResolve += "Update " + name + " finish." + "<br>";
                         if (counter.counter === 1) {
                                 db.doc(docPath).update(objUpdate).then(() => db.doc("home/updatestatus").set({lastupdate: admin.firestore.FieldValue.serverTimestamp()})).then(() => {
-                                        console.log("Update finish.");
-                                        finalResolve += "Update finish." + "<br>";
+                                        console.log("=>=> ::: Everything upto date ::: <=<=");
+                                        finalResolve += "=>=> ::: Everything upto date ::: <=<=" + "<br>";
                                         resolve(finalResolve);
                                 }).catch((error) => {
                                         if (error.code === 5) {
-                                                db.doc(docPath).set(objUpdate).then(() => db.doc("home/updatestatus").set({lastupdate: admin.firestore.FieldValue.serverTimestamp()})).then(() => {console.log("Set new data finish."); resolve("Set new data finish.")}).catch((error) => {console.log(error)});
+                                                db.doc(docPath).set(objUpdate).then(() => db.doc("home/updatestatus").set({lastupdate: admin.firestore.FieldValue.serverTimestamp()})).then(() => {console.log("Set new data finish."); resolve("Set new data finish.");}).catch((error) => {console.log(error)});
                                         } else console.log(error);
                                 });
                         } else {
@@ -235,8 +246,9 @@ function updateAll() {
                         console.log(error);
                         if (counter.counter === 1) {
                                 db.doc(docPath).update(objUpdate).then(() => db.doc("home/updatestatus").set({lastupdate: admin.firestore.FieldValue.serverTimestamp()})).then(() => {
-                                        console.log("Update finish.");
-                                        resolve("Update finish.");
+                                        console.log("=>=> ::: Everything upto date ::: <=<=");
+                                        finalResolve += "=>=> ::: Everything upto date ::: <=<=" + "<br>";
+                                        resolve(finalResolve);
                                 }).catch((error) => {
                                         if (error.code === 5) {
                                                 db.doc(docPath).set(objUpdate).then(() => db.doc("home/updatestatus").set({lastupdate: admin.firestore.FieldValue.serverTimestamp()})).then(() => {console.log("Set new data finish."); resolve("Set new data finish.");}).catch((error) => {console.log(error)});
