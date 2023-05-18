@@ -343,7 +343,8 @@ function updateAll() {
                         }
                 }
                 function errorCounter(error) {
-                        console.log(error);
+                        console.error(error);
+			finalResolve += 'Error processing info.<br>';
                         if (counter.counter === 1) {
                                 db.doc(docPath).update(objUpdate).then(() => db.doc("home/updatestatus").set({lastupdate: admin.firestore.FieldValue.serverTimestamp()})).then(() => {
                                         console.log("=>=> ::: Everything upto date ::: <=<=");
@@ -357,6 +358,7 @@ function updateAll() {
                         } else {
                                 --counter.counter;
                                 console.log("Pending: " + counter.counter);
+				finalResolve += 'Pending: ' + counter.counter + '<br>';
                         }
                 }
         });
