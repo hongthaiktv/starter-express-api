@@ -7,12 +7,35 @@ const AWS = require("aws-sdk");
 const s3 = new AWS.S3();
 const { JSDOM } = require('jsdom');
 const request = require('request');
+const path = require('path');
 const document = new JSDOM().window.document;
+
+
+/*
+const { createWorker } = require('tesseract.js');
+
+const worker = createWorker({
+  //langPath: path.join(__dirname, 'lang-data'), 
+  //logger: m => console.log(m),
+});
+
+(async () => {
+  await worker.load();
+  await worker.loadLanguage('vie');
+  await worker.initialize('vie');
+  const { data: { text } } = await worker.recognize(path.join(__dirname, 'img.png'));
+  console.log(text.match(/[0-9]{5}/g));
+  await worker.terminate();
+})();
+*/
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const token = "5161768feb4d724ef66d6f72aca3a3bd0f5f82a935fcc6d23041e4f6f6f7bfc7fa7e2d2839de9aa1b880d58e529fa6d7fc348f5c48fd0f699068323b9078cc8ac4ef5dab4a6a894bc9c58e1b5791602b4aa345d9ca994daa441fe80c419635435538d81fe8f675e2564ffa2483a0ee4f580da319f602bd33dff198991c2c79dc";
+
+const APPSETTING = {serviceAccount: {}};
+var db;
 
 function dateUTC7() {
     let now = Date.now() + (7 * 60 * 60 * 1000);
@@ -20,19 +43,17 @@ function dateUTC7() {
 }
 console.log(dateUTC7());
 
-const APPSETTING = {};
-var db;
-
 try {
     APPSETTING.serviceAccount = require('./onepage-serviceAccountKey.json');
     console.log('Uploading Firebase config to AWS...');
     s3Put(APPSETTING.serviceAccount, 'API/serviceAccountKey.json').then(result => {
-	serverInit(APPSETTING.serviceAccount);
+	serverInit(APPSETTING.serviceAccount.firebase);
     });
 } catch(err) {
     console.log('Loading Firebase config...');
     s3Get('API/serviceAccountKey.json').then(result => {
-	serverInit(result);
+	APPSETTING.serviceAccount = result;
+	serverInit(APPSETTING.serviceAccount.firebase);
     });
 }
 
@@ -71,11 +92,48 @@ function serverInit(serviceAccount) {
     });
 }
 
+function parseImg(imageUrl, regExp) {
+    return new Promise(function(resolve, reject) {
+const options = {
+  method: 'POST',
+  url: 'https://api.ocr.space/parse/image',
+  headers: {
+    'Content-Type': 'multipart/form-data',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0'
+  },
+  formData: {
+    apikey: APPSETTING.serviceAccount.ocr,
+    url: imageUrl,
+    language: 'vie',
+    scale: 'true',
+    isTable: 'true',
+    OCREngine: '3',
+    detectOrientation: 'true'
+  }
+};
+
+request(options, function (error, response, body) {
+  if (error) {reject(new Error(error)); return;}
+
+  const result = JSON.parse(body);
+
+  if (result.IsErroredOnProcessing) {
+    reject(new Error(result.ErrorMessage));
+  } else { 
+    const regText = result.ParsedResults[0].ParsedText.match(regExp);
+    resolve(regText);
+  }
+});
+});
+}
+
 
 app.get('/', (req, res) => {
         res.send(`<!DOCTYPE html>
-                      <html>
+                      <html lang='en'>
                         <head>
+			    <meta charset="utf-8" />
+			    <meta name="viewport" content="width=device-width" />
                             <title>Onepage Update Center</title>
                         </head>
                         <body>
@@ -94,8 +152,10 @@ app.get('/update', (req, res) => {
         if (true) {
                 updateAll().then((result) => {
                         res.send(`<!DOCTYPE html>
-                      <html>
+                      <html lang='en'>
                         <head>
+			    <meta charset="utf-8" />
+			    <meta name="viewport" content="width=device-width" />
                             <title>Onepage Update Server</title>
                         </head>
                         <body>
@@ -213,8 +273,48 @@ function updateAll() {
 	    let urlText = anchor.innerHTML;
 	    if (/điều chỉnh giá xăng dầu/i.test(urlText)) {
 		updateHTML(url, 'div.entry-detail img').then(result => {
-		    objResult.html = result[0].outerHTML;
-		    checkCounter("giaxang", objResult);
+		    let imgSrc = result[0].getAttribute('src');
+		    parseImg(imgSrc, /\d+\.\d+/g).then(result => {
+    let html = `
+    <table class='table table-striped'>
+	<thead>
+	    <tr>
+		<td>Mặt hàng</td><td>Đơn vị tính</td><td>Vùng 1</td><td>Vùng 2</td>
+	    </tr>
+	</thead>
+	<tbody>
+	    <tr>
+		<td>Xăng RON 95-V</td><td>Đồng/lít</td><td>${result[0]}</td><td>${result[1]}</td>
+	    </tr>
+	    <tr>
+		<td>Xăng RON 95-III</td><td>Đồng/lít</td><td>${result[2]}</td><td>${result[3]}</td>
+	    </tr>
+	    <tr>
+		<td>Xăng sinh học E5 RON 92-II</td><td>Đồng/lít</td><td>${result[4]}</td><td>${result[5]}</td>
+	    </tr>
+	    <tr>
+		<td>Điêzen 0,001S-V</td><td>Đồng/lít</td><td>${result[6]}</td><td>${result[7]}</td>
+	    </tr>
+	    <tr>
+		<td>Điêzen 0,05S-II</td><td>Đồng/lít</td><td>${result[8]}</td><td>${result[9]}</td>
+	    </tr>
+	    <tr>
+		<td>Dầu hoả 2 - K</td><td>Đồng/lít</td><td>${result[10]}</td><td>${result[11]}</td>
+	    </tr>
+	    <tr>
+		<td>Mazút N2B (3,0S)</td><td>Đồng/kg</td><td>${result[12]}</td><td>${result[13]}</td>
+	    </tr>
+	    <tr>
+		<td>Mazút N2B (3,5S)</td><td>Đồng/kg</td><td>${result[14]}</td><td>${result[15]}</td>
+	    </tr>
+	    <tr>
+		<td>Mazút 180cst - 0,5S (RMG)</td><td>Đồng/kg</td><td>${result[16]}</td><td>${result[17]}</td>
+	    </tr>
+	</tbody>
+    </table>`;
+	objResult.html = html;
+	checkCounter("giaxang", objResult);
+		    }).catch(error => errorCounter(error));
 		}).catch(error => errorCounter(error));
 		break;
 	    }
