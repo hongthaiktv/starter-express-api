@@ -77,8 +77,10 @@ async function s3Get(path) {
         Key: path
     });
     file = await file.Body.transformToString();
+    file = JSON.parse(file);
     //file = JSON.parse(file.Body.toString());
     console.log(`Get file **${path}** success.`);
+    console.log(file);
     return file;
 }
 
