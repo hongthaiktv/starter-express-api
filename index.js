@@ -76,7 +76,8 @@ async function s3Get(path) {
         Bucket: "cyclic-desert-sand-barnacle-shoe-ap-northeast-1",
         Key: path
     });
-    file = JSON.parse(file.Body.toString());
+    file = await file.Body.transformToString();
+    //file = JSON.parse(file.Body.toString());
     console.log(`Get file **${path}** success.`);
     return file;
 }
