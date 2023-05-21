@@ -75,7 +75,7 @@ async function s3Get(path) {
     let file =  await s3.getObject({
         Bucket: "cyclic-desert-sand-barnacle-shoe-ap-northeast-1",
         Key: path
-    }).promise();
+    });
     file = JSON.parse(file.Body.toString());
     console.log(`Get file **${path}** success.`);
     return file;
