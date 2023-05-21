@@ -3,8 +3,10 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const domain = 'https://onepage.cyclic.app';
 const admin = require('firebase-admin');
-const AWS = require("aws-sdk");
-const s3 = new AWS.S3();
+//const AWS = require("aws-sdk");
+//const s3 = new AWS.S3();
+const AWS = require('@aws-sdk/client-s3');
+const s3 = new AWS({});
 const { JSDOM } = require('jsdom');
 const request = require('request');
 const path = require('path');
@@ -302,10 +304,10 @@ function updateAll() {
 		<td>Dầu hoả 2 - K</td><td>Đồng/lít</td><td>${result[10]}</td><td>${result[11]}</td>
 	    </tr>
 	    <tr>
-		<td>Mazút N2B (3,0S)</td><td>Đồng/kg</td><td>${result[12]}</td><td>${result[13]}</td>
+		<td>Mazút N<sup>o</sup>2B (3,0S)</td><td>Đồng/kg</td><td>${result[12]}</td><td>${result[13]}</td>
 	    </tr>
 	    <tr>
-		<td>Mazút N2B (3,5S)</td><td>Đồng/kg</td><td>${result[14]}</td><td>${result[15]}</td>
+		<td>Mazút N<sup>o</sup>2B (3,5S)</td><td>Đồng/kg</td><td>${result[14]}</td><td>${result[15]}</td>
 	    </tr>
 	    <tr>
 		<td>Mazút 180cst - 0,5S (RMG)</td><td>Đồng/kg</td><td>${result[16]}</td><td>${result[17]}</td>
