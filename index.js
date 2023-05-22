@@ -47,12 +47,14 @@ console.log(dateUTC7());
 
 try {
     APPSETTING.serviceAccount = require('./onepage-serviceAccountKey.json');
-    console.log('Uploading Firebase config to AWS...');
+    serverInit(APPSETTING.serviceAccount.firebase);
+    /*
+    console.log('Uploading API config to AWS...');
     s3Put(APPSETTING.serviceAccount, 'API/serviceAccountKey.json').then(result => {
 	serverInit(APPSETTING.serviceAccount.firebase);
-    });
+    }); */
 } catch(err) {
-    console.log('Loading Firebase config...');
+    console.log('Loading API config...');
     s3Get('API/serviceAccountKey.json').then(result => {
 	APPSETTING.serviceAccount = result;
 	serverInit(APPSETTING.serviceAccount.firebase);
@@ -63,10 +65,10 @@ try {
 async function s3Put(file, path) {
     let upload = await s3.putObject({
 	ContentType: 'application/json',
-	Body: JSON.stringify(file),
+	Body: JSON.stringify(file, null, 2),
         Bucket: "cyclic-desert-sand-barnacle-shoe-ap-northeast-1",
         Key: path
-    }).promise();
+    });
     console.log('Upload to AWS S3 Server success.');
     return upload;
 }
