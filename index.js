@@ -3,10 +3,6 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const domain = 'https://onepage.cyclic.app';
 const admin = require('firebase-admin');
-//const AWS = require("aws-sdk");
-//const s3 = new AWS.S3();
-const { S3 } = require('@aws-sdk/client-s3');
-const s3 = new S3({});
 const { JSDOM } = require('jsdom');
 const request = require('request');
 const path = require('path');
@@ -63,24 +59,26 @@ try {
 
 
 async function s3Put(file, path) {
+    const AWS = require("aws-sdk");
+    const s3 = new AWS.S3();
     let upload = await s3.putObject({
 	ContentType: 'application/json',
 	Body: JSON.stringify(file, null, 2),
         Bucket: "cyclic-desert-sand-barnacle-shoe-ap-northeast-1",
         Key: path
-    });
+    }).promise();
     console.log('Upload to AWS S3 Server success.');
     return upload;
 }
 
 async function s3Get(path) {
+    const AWS = require("aws-sdk");
+    const s3 = new AWS.S3();
     let file =  await s3.getObject({
         Bucket: "cyclic-desert-sand-barnacle-shoe-ap-northeast-1",
         Key: path
-    });
-    file = await file.Body.transformToString();
-    file = JSON.parse(file);
-    //file = JSON.parse(file.Body.toString());
+    }).promise();
+    file = JSON.parse(file.Body.toString());
     console.log(`Get file **${path}** success.`);
     return file;
 }
