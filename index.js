@@ -277,7 +277,7 @@ function updateAll() {
 	    let url = 'https://www.petrolimex.com.vn' + anchor.getAttribute('href');
 	    let urlText = anchor.innerHTML;
 	    if (/điều chỉnh giá xăng dầu/i.test(urlText)) {
-		updateHTML(url, 'div.entry-detail img').then(result => {
+		return updateHTML(url, 'div.entry-detail img').then(result => {
 	console.log('2st request');
 		    let imgSrc = result[0].getAttribute('src');
 		    parseImg(imgSrc, /\d+\.\d+/g).then(result => {
