@@ -117,18 +117,17 @@ const options = {
 };
 
 request(options, function (error, response, body) {
-  if (error) {reject(new Error(error)); return;}
-
+  if (error) return reject(new Error(error));
   const result = JSON.parse(body);
 
   if (result.IsErroredOnProcessing) {
     reject(new Error(result.ErrorMessage));
-  } else { 
+  } else {
     const regText = result.ParsedResults[0].ParsedText.match(regExp);
     resolve(regText);
   }
-});
-});
+    });
+  });
 }
 
 
