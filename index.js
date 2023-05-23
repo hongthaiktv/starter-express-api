@@ -12,9 +12,8 @@ const document = new JSDOM().window.document;
 /*
 const { createWorker } = require('tesseract.js');
 
-const worker = createWorker({
-  //langPath: path.join(__dirname, 'lang-data'), 
-  //logger: m => console.log(m),
+const worker = createWorker({ 
+  //logger: m => console.log(m)
 });
 
 (async () => {
@@ -105,6 +104,7 @@ const options = {
     'Content-Type': 'multipart/form-data',
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0'
   },
+  strictSSL: false,
   formData: {
     apikey: APPSETTING.serviceAccount.ocr,
     url: imageUrl,
