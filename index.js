@@ -265,22 +265,22 @@ function updateAll() {
     }).catch((error) => {errorCounter(error)});
                 updateHTML("https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi.html", "div.post-detail-list.category-thongcao > div", counter).then((result) => {
 	console.log('1st request');
-	let objResult = {
-	    group: 'Tổng hợp',
-	    html: '',
-	    image: 'images/petrolimex.jpg',
-	    order: 1,
-	    title: 'Bảng giá xăng dầu'
-	};
 	for (const [index, ele] of Object.entries(result)) {
 	    let anchor = ele.querySelector('h3 a');
 	    let url = 'https://www.petrolimex.com.vn' + anchor.getAttribute('href');
 	    let urlText = anchor.innerHTML;
 	    if (/điều chỉnh giá xăng dầu/i.test(urlText)) {
-		return updateHTML(url, 'div.entry-detail img').then(result => {
-	console.log('2st request');
+		return updateHTML(url, 'div.entry-detail img');
+	    }
+	}
+	throw 'Giá xăng: Not found relate article.';
+    })
+    .then(result => {
+	console.log('2nd request');
 		    let imgSrc = result[0].getAttribute('src');
-		    parseImg(imgSrc, /\d+\.\d+/g).then(result => {
+	return parseImg(imgSrc, /\d+\.\d+/g);
+    })
+    .then(result => {
     let html = `
     <table class='table table-striped'>
 	<thead>
@@ -318,14 +318,18 @@ function updateAll() {
 	    </tr>
 	</tbody>
     </table>`;
-	objResult.html = html;
+
+	let objResult = {
+	    group: 'Tổng hợp',
+	    html: html,
+	    image: 'images/petrolimex.jpg',
+	    order: 1,
+	    title: 'Bảng giá xăng dầu'
+	};
+
 	checkCounter("giaxang", objResult);
-		    }).catch(error => errorCounter(error));
-		}).catch(error => errorCounter(error));
-		break;
-	    }
-	}
-    }).catch((error) => {errorCounter(error)});
+    })
+    .catch((error) => {errorCounter(error)});
                 console.log("Total update: " + counter.counter);
                 finalResolve += "Total update: " + counter.counter + "<br>";
                 function checkCounter(name, result) {
