@@ -264,6 +264,7 @@ function updateAll() {
 	checkCounter("giavang", objResult);
     }).catch((error) => {errorCounter(error)});
                 updateHTML("https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi.html", "div.post-detail-list.category-thongcao > div", counter).then((result) => {
+	console.log('1st request');
 	let objResult = {
 	    group: 'Tổng hợp',
 	    html: '',
