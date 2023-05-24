@@ -164,7 +164,7 @@ app.get('/update', (req, res) => {
                         </head>
                         <body>
                             <h1 style="text-align:center;">Onepage Update Center</h1>
-                            <h3>${result}</h3>
+                            <h4>${result}</h4>
                         </body>
                       </html>`);
                       }).catch((err) => {
