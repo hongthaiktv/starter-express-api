@@ -9,6 +9,7 @@ const path = require('path');
 const document = new JSDOM().window.document;
 
 
+
 /*
 const { createWorker } = require('tesseract.js');
 
@@ -183,7 +184,10 @@ function updateHTML(url, query, counter) {
                 function tryLoading() {
                         request({
                                 url: url,
-                                headers: {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0"},
+                                headers: {
+    "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0",
+    "Cache-Control": "no-cache, no-store"
+				},
                                 strictSSL: false
                         },
                         function (error, response, body) {
@@ -262,7 +266,13 @@ function updateAll() {
 	objResult.html = result.outerHTML;
 	checkCounter("giavang", objResult);
     }).catch((error) => {errorCounter(error)});
-                updateHTML("https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi.html", "div.post-detail-list.category-thongcao > div", counter).then((result) => {
+
+//test
+//updateHTML("https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi.html", "div.post-detail-list.category-thongcao > div");
+//updateHTML(url, 'div.entry-detail img');
+
+
+               updateHTML("https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi.html", "div.post-detail-list.category-thongcao > div", counter).then((result) => {
 	console.log('1st request');
 	for (const [index, ele] of Object.entries(result)) {
 	    let anchor = ele.querySelector('h3 a');
@@ -329,6 +339,7 @@ function updateAll() {
 	checkCounter("giaxang", objResult);
     })
     .catch((error) => {errorCounter(error)});
+
                 console.log("Total update: " + counter.counter);
                 finalResolve += "Total update: " + counter.counter + "<br>";
                 function checkCounter(name, result) {
