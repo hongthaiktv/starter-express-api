@@ -268,11 +268,11 @@ function updateAll() {
     }).catch((error) => {errorCounter(error)});
 
 //test
-//updateHTML("https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi.html", "div.post-detail-list.category-thongcao > div");
-//updateHTML(url, 'div.entry-detail img');
+updateHTML("https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi.html", "div.post-detail-list.category-thongcao > div");
+updateHTML('https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi/petrolimex-dieu-chinh-gia-xang-dau-tu-15-gio-00-phut-ngay-11-5-2023-1684740728-1239646330.html', 'div.entry-detail img');
 
 
-               updateHTML("https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi.html", "div.post-detail-list.category-thongcao > div", counter).then((result) => {
+               /*updateHTML("https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi.html", "div.post-detail-list.category-thongcao > div", counter).then((result) => {
 	console.log('1st request');
 	for (const [index, ele] of Object.entries(result)) {
 	    let anchor = ele.querySelector('h3 a');
@@ -339,7 +339,7 @@ function updateAll() {
 	checkCounter("giaxang", objResult);
     })
     .catch((error) => {errorCounter(error)});
-
+*/
                 console.log("Total update: " + counter.counter);
                 finalResolve += "Total update: " + counter.counter + "<br>";
                 function checkCounter(name, result) {
