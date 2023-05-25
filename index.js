@@ -209,7 +209,7 @@ function updateHTML(url, query, counter) {
 }
 
 function updateAll() {
-        return new Promise(function(resolve, reject) {
+        return new Promise(async function(resolve, reject) {
                 var finalResolve = "";
                 var dateUTC7 = Date.now() + (7 * 60 * 60 *1000);
 		console.log();
@@ -268,9 +268,9 @@ function updateAll() {
     }).catch((error) => {errorCounter(error)});
 
 //test
-updateHTML("https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi.html", "div.post-detail-list.category-thongcao > div");
-updateHTML('https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi/petrolimex-dieu-chinh-gia-xang-dau-tu-15-gio-00-phut-ngay-11-5-2023-1684740728-1239646330.html', 'div.entry-detail img');
-
+let a = await updateHTML("https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi.html", "div.post-detail-list.category-thongcao > div");
+let b = await updateHTML('https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi/petrolimex-dieu-chinh-gia-xang-dau-tu-15-gio-00-phut-ngay-11-5-2023-1684740728-1239646330.html', 'div.entry-detail img');
+console.log(b);
 
                /*updateHTML("https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi.html", "div.post-detail-list.category-thongcao > div", counter).then((result) => {
 	console.log('1st request');
