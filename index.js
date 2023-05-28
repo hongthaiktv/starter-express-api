@@ -233,25 +233,25 @@ function updateAll() {
 	};
 	checkCounter("kqxs", objResult);
     }).catch((error) => {errorCounter(error)});
+		counter.counter++;
                 updateHTML("https://www.sacombank.com.vn/company/Pages/ty-gia.aspx", ".table", counter).then((result) => {	
-	let objResult = {
+	let objTygia1 = {
 	    group: 'Tổng hợp',
 	    html: result[0].outerHTML,
 	    image: 'images/money-exchange-001.jpg',
 	    order: 4,
 	    title: 'Tỷ giá USD và G7'
 	};
-	checkCounter("tygia", objResult);
-    }).catch((error) => {errorCounter(error)});
-                updateHTML("https://www.sacombank.com.vn/company/Pages/ty-gia.aspx", ".table", counter).then((result) => {	
-	let objResult = {
+	checkCounter("tygia", objTygia1);
+
+	let objTygia2 = {
 	    group: 'Tổng hợp',
 	    html: result[2].outerHTML,
 	    image: 'images/money-exchange-002.jpg',
 	    order: 5,
 	    title: 'Tỷ giá ngoại tệ khác'
 	};
-	checkCounter("tygia2", objResult);
+	checkCounter("tygia2", objTygia2);
     }).catch((error) => {errorCounter(error)});
                 updateHTML("http://www.sjc.com.vn/giavang/textContent.php", "table", counter).then((result) => {
 	result = result[0];
