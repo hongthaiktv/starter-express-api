@@ -4,7 +4,7 @@ const PORT = process.env.PORT || 8080;
 const domain = 'https://onepage.cyclic.app';
 const admin = require('firebase-admin');
 const { JSDOM } = require('jsdom');
-const request = require('request').defaults({jar: true});
+const request = require('request');
 const path = require('path');
 const document = new JSDOM().window.document;
 
@@ -185,6 +185,7 @@ function updateHTML(url, query, counter) {
                 var retry = 0;
                 tryLoading();
                 function tryLoading() {
+			const request = request.defaults({jar: false});
                         request({
                                 url: url,
                                 headers: {
