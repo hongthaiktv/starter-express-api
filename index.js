@@ -185,7 +185,7 @@ function updateHTML(url, query, counter) {
                 var retry = 0;
                 tryLoading();
                 function tryLoading() {
-			const request = request.defaults({jar: false});
+			const request = require('request');
                         request({
                                 url: url,
                                 headers: {
