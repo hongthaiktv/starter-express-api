@@ -4,7 +4,7 @@ const PORT = process.env.PORT || 8080;
 const domain = 'https://onepage.cyclic.app';
 const admin = require('firebase-admin');
 const { JSDOM } = require('jsdom');
-const request = require('request');
+const request = require('request').defaults({jar: true});
 const path = require('path');
 const document = new JSDOM().window.document;
 
@@ -191,8 +191,7 @@ function updateHTML(url, query, counter) {
     "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0",
     "Cache-Control": "no-cache, no-store"
 				},
-                                strictSSL: false,
-				jar: request.jar()
+                                strictSSL: false
                         },
                         function (error, response, body) {
                                 if (error) reject(error);
