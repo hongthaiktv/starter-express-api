@@ -191,7 +191,8 @@ function updateHTML(url, query, counter) {
     "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0",
     "Cache-Control": "no-cache, no-store"
 				},
-                                strictSSL: false
+                                strictSSL: false,
+				agentOptions: {securityOptions: 'SSL_OP_NO_SSLv3'}
                         },
                         function (error, response, body) {
                                 if (error) reject(error);
