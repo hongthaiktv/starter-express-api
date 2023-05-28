@@ -4,7 +4,7 @@ const PORT = process.env.PORT || 8080;
 const domain = 'https://onepage.cyclic.app';
 const admin = require('firebase-admin');
 const { JSDOM } = require('jsdom');
-const request = require('request').defaults({jar: false});
+const request = require('request');
 const path = require('path');
 const document = new JSDOM().window.document;
 
@@ -191,7 +191,8 @@ function updateHTML(url, query, counter) {
     "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0",
     "Cache-Control": "no-cache, no-store"
 				},
-                                strictSSL: false
+                                strictSSL: false,
+				jar: request.jar()
                         },
                         function (error, response, body) {
                                 if (error) reject(error);
@@ -272,6 +273,7 @@ function updateAll() {
 
                updateHTML("https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi.html", "div.post-detail-list.category-thongcao > div", counter).then((result) => {
 	console.log('Giá xăng: Get article list success.');
+	finalResolve += 'Giá xăng: Get article list success.<br>';
 	for (const [index, ele] of Object.entries(result)) {
 	    let anchor = ele.querySelector('h3 a');
 	    let url = 'https://www.petrolimex.com.vn' + anchor.getAttribute('href');
@@ -284,11 +286,13 @@ function updateAll() {
     })
     .then(result => {
 	console.log('Giá xăng: Found price table image.');
+	finalResolve += 'Giá xăng: Found price table image.<br>';
 	let imgSrc = result[0].getAttribute('src');
 	return parseImg(imgSrc, /\d+\.\d{3}/g);
     })
     .then(result => {
     console.log('Giá xăng: Converted image to text.');
+    finalResolve += 'Giá xăng: Converted image to text.<br>';
     let html = `
     <table class='table table-striped'>
 	<thead>
