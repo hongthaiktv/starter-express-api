@@ -4,7 +4,7 @@ const PORT = process.env.PORT || 8080;
 const domain = 'https://onepage.cyclic.app';
 const admin = require('firebase-admin');
 const { JSDOM } = require('jsdom');
-const request = require('request');
+const request = require('request').defaults({jar: false});
 const path = require('path');
 const document = new JSDOM().window.document;
 
@@ -124,8 +124,11 @@ request(options, function (error, response, body) {
   if (result.IsErroredOnProcessing) {
     reject(new Error(result.ErrorMessage));
   } else {
-    const regText = result.ParsedResults[0].ParsedText.match(regExp);
+    const txt = result.ParsedResults[0].ParsedText;
+    if (regExp) {
+    let regText = txt.match(regExp);
     resolve(regText);
+    } else resolve(txt);
   }
     });
   });
@@ -209,7 +212,7 @@ function updateHTML(url, query, counter) {
 }
 
 function updateAll() {
-        return new Promise(async function(resolve, reject) {
+        return new Promise(function(resolve, reject) {
                 var finalResolve = "";
                 var dateUTC7 = Date.now() + (7 * 60 * 60 *1000);
 		console.log();
@@ -267,13 +270,8 @@ function updateAll() {
 	checkCounter("giavang", objResult);
     }).catch((error) => {errorCounter(error)});
 
-//test
-let a = await updateHTML("https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi.html", "div.post-detail-list.category-thongcao > div");
-let b = await updateHTML('https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi/petrolimex-dieu-chinh-gia-xang-dau-tu-15-gio-00-phut-ngay-11-5-2023-1684740728-1239646330.html', 'div.entry-detail img');
-console.log(b);
-
-               /*updateHTML("https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi.html", "div.post-detail-list.category-thongcao > div", counter).then((result) => {
-	console.log('1st request');
+               updateHTML("https://www.petrolimex.com.vn/ndi/thong-cao-bao-chi.html", "div.post-detail-list.category-thongcao > div", counter).then((result) => {
+	console.log('Giá xăng: Get article list success.');
 	for (const [index, ele] of Object.entries(result)) {
 	    let anchor = ele.querySelector('h3 a');
 	    let url = 'https://www.petrolimex.com.vn' + anchor.getAttribute('href');
@@ -285,11 +283,12 @@ console.log(b);
 	throw 'Giá xăng: Not found relate article.';
     })
     .then(result => {
-	console.log('2nd request');
-		    let imgSrc = result[0].getAttribute('src');
-	return parseImg(imgSrc, /\d+\.\d+/g);
+	console.log('Giá xăng: Found price table image.');
+	let imgSrc = result[0].getAttribute('src');
+	return parseImg(imgSrc, /\d+\.\d{3}/g);
     })
     .then(result => {
+    console.log('Giá xăng: Converted image to text.');
     let html = `
     <table class='table table-striped'>
 	<thead>
@@ -339,7 +338,7 @@ console.log(b);
 	checkCounter("giaxang", objResult);
     })
     .catch((error) => {errorCounter(error)});
-*/
+
                 console.log("Total update: " + counter.counter);
                 finalResolve += "Total update: " + counter.counter + "<br>";
                 function checkCounter(name, result) {
