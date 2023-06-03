@@ -8,7 +8,7 @@ const request = require('request');
 const path = require('path');
 const document = new JSDOM().window.document;
 
-
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 /*
 const { createWorker } = require('tesseract.js');
@@ -191,8 +191,7 @@ function updateHTML(url, query, counter) {
     "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0",
     "Cache-Control": "no-cache, no-store"
 				},
-                                strictSSL: false,
-				agentOptions: {secureProtocol: 'TLSv1_2_method'}
+                                strictSSL: false
                         },
                         function (error, response, body) {
                                 if (error) reject(error);
