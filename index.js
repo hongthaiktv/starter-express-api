@@ -192,7 +192,7 @@ function updateHTML(url, query, counter) {
     "Cache-Control": "no-cache, no-store"
 				},
                                 strictSSL: false,
-				agentOptions: {secureProtocol: 'TLSv1_1_method'}
+				agentOptions: {secureProtocol: 'SSLv3_method'}
                         },
                         function (error, response, body) {
                                 if (error) reject(error);
