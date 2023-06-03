@@ -8,7 +8,7 @@ const request = require('request');
 const path = require('path');
 const document = new JSDOM().window.document;
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 
 /*
 const { createWorker } = require('tesseract.js');
