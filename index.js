@@ -233,8 +233,8 @@ function updateAll() {
 	};
 	checkCounter("kqxs", objResult);
     }).catch((error) => {errorCounter(error)});
-		counter.counter++;
-                updateHTML("https://www.sacombank.com.vn/company/Pages/ty-gia.aspx", ".table", counter).then((result) => {	
+		//counter.counter++;
+                updateHTML("https://www.sacombank.com.vn/cong-cu/ty-gia.html", "table.exchange-rate__body-table", counter).then((result) => {	
 	let objTygia1 = {
 	    group: 'Tổng hợp',
 	    html: result[0].outerHTML,
@@ -243,7 +243,7 @@ function updateAll() {
 	    title: 'Tỷ giá USD và G7'
 	};
 	checkCounter("tygia", objTygia1);
-
+/*
 	let objTygia2 = {
 	    group: 'Tổng hợp',
 	    html: result[2].outerHTML,
@@ -252,7 +252,9 @@ function updateAll() {
 	    title: 'Tỷ giá ngoại tệ khác'
 	};
 	checkCounter("tygia2", objTygia2);
+*/
     }).catch((error) => {errorCounter(error)});
+
                 updateHTML("http://www.sjc.com.vn/giavang/textContent.php", "table", counter).then((result) => {
 	result = result[0];
 	let objResult = {
